@@ -4,9 +4,9 @@ import { WindowsControlResponse } from '../../types/responses.js';
 import { ClipboardAutomation } from '../../interfaces/automation.js';
 
 /**
- * NutJS implementation of the ClipboardAutomation interface
+ * RobotJS implementation of the ClipboardAutomation interface
  */
-export class NutJSClipboardAutomation implements ClipboardAutomation {
+export class RobotJSClipboardAutomation implements ClipboardAutomation {
   async getClipboardContent(): Promise<WindowsControlResponse> {
     try {
       const content = await clipboardy.read();

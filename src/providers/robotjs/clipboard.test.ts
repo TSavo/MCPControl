@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { NutJSClipboardAutomation } from './clipboard.js';
+import { RobotJSClipboardAutomation } from './clipboard.js';
 import clipboardy from 'clipboardy';
 
 // Mock clipboardy
@@ -12,11 +12,11 @@ vi.mock('clipboardy', () => {
   };
 });
 
-describe('NutJSClipboardAutomation', () => {
-  let clipboardAutomation: NutJSClipboardAutomation;
+describe('RobotJSClipboardAutomation', () => {
+  let clipboardAutomation: RobotJSClipboardAutomation;
 
   beforeEach(() => {
-    clipboardAutomation = new NutJSClipboardAutomation();
+    clipboardAutomation = new RobotJSClipboardAutomation();
     // Reset mocks
     vi.resetAllMocks();
   });

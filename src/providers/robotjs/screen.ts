@@ -1,27 +1,27 @@
-import libnut from '@nut-tree-fork/libnut';
+import robot from '@jitsi/robotjs';
 import sharp from 'sharp';
-import { WindowInfo, ScreenshotOptions } from '../../types/common.js';
+import { ScreenshotOptions } from '../../types/common.js';
 import { WindowsControlResponse } from '../../types/responses.js';
 import { ScreenAutomation } from '../../interfaces/automation.js';
 
 /**
- * NutJS implementation of the ScreenAutomation interface
+ * RobotJS implementation of the ScreenAutomation interface
  */
-export class NutJSScreenAutomation implements ScreenAutomation {
+export class RobotJSScreenAutomation implements ScreenAutomation {
   /**
    * Gets the current screen dimensions
    * @returns WindowsControlResponse with width and height of the screen
    */
   getScreenSize(): WindowsControlResponse {
     try {
-      const screen = libnut.screen.capture() as { width: number; height: number; image: Buffer };
+      const screenSize = robot.getScreenSize();
 
       return {
         success: true,
         message: 'Screen size retrieved successfully',
         data: {
-          width: screen.width,
-          height: screen.height,
+          width: screenSize.width,
+          height: screenSize.height,
         },
       };
     } catch (error) {
@@ -35,66 +35,29 @@ export class NutJSScreenAutomation implements ScreenAutomation {
   /**
    * Gets information about the currently active window
    * @returns WindowsControlResponse with title, position, and size of the active window
+   * @note RobotJS does not support window management - this returns an error
    */
   getActiveWindow(): WindowsControlResponse {
-    try {
-      const handle = libnut.getActiveWindow();
-      const title = libnut.getWindowTitle(handle);
-      const rect = libnut.getWindowRect(handle);
-
-      const windowInfo: WindowInfo = {
-        title: title,
-        position: { x: rect.x, y: rect.y },
-        size: { width: rect.width, height: rect.height },
-      };
-
-      return {
-        success: true,
-        message: 'Active window information retrieved successfully',
-        data: windowInfo,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: `Failed to get active window information: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    // RobotJS does not have window management capabilities
+    return {
+      success: false,
+      message:
+        'RobotJS does not support window management. Use a different automation provider for window operations.',
+    };
   }
 
   /**
    * Brings a window to the foreground by searching for a window with the given title
    * @param title - The title or partial title of the window to focus
    * @returns WindowsControlResponse indicating success or failure
+   * @note RobotJS does not support window management - this returns an error
    */
   focusWindow(title: string): WindowsControlResponse {
-    try {
-      const handles = libnut.getWindows();
-
-      for (const handle of handles) {
-        try {
-          const windowTitle = libnut.getWindowTitle(handle);
-          if (windowTitle.includes(title)) {
-            libnut.focusWindow(handle);
-            return {
-              success: true,
-              message: `Successfully focused window: ${title}`,
-            };
-          }
-        } catch {
-          continue;
-        }
-      }
-
-      return {
-        success: false,
-        message: `Could not find window with title: ${title}`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: `Failed to focus window: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    // RobotJS does not have window management capabilities
+    return {
+      success: false,
+      message: `RobotJS does not support window management. Cannot focus window: ${title}. Use a different automation provider for window operations.`,
+    };
   }
 
   /**
@@ -103,6 +66,7 @@ export class NutJSScreenAutomation implements ScreenAutomation {
    * @param width - The new width of the window in pixels
    * @param height - The new height of the window in pixels
    * @returns WindowsControlResponse indicating success or failure
+   * @note RobotJS does not support window management - this returns an error
    */
   // eslint-disable-next-line @typescript-eslint/require-await
   async resizeWindow(
@@ -110,34 +74,11 @@ export class NutJSScreenAutomation implements ScreenAutomation {
     width: number,
     height: number,
   ): Promise<WindowsControlResponse> {
-    try {
-      const handles = libnut.getWindows();
-
-      for (const handle of handles) {
-        try {
-          const windowTitle = libnut.getWindowTitle(handle);
-          if (windowTitle.includes(title)) {
-            libnut.resizeWindow(handle, { width, height });
-            return {
-              success: true,
-              message: `Successfully resized window: ${title} to ${width}x${height}`,
-            };
-          }
-        } catch {
-          continue;
-        }
-      }
-
-      return {
-        success: false,
-        message: `Could not find window with title: ${title}`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: `Failed to resize window: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    // RobotJS does not have window management capabilities
+    return {
+      success: false,
+      message: `RobotJS does not support window management. Cannot resize window: ${title} to ${width}x${height}. Use a different automation provider for window operations.`,
+    };
   }
 
   /**
@@ -146,37 +87,15 @@ export class NutJSScreenAutomation implements ScreenAutomation {
    * @param x - The new x-coordinate of the window in pixels
    * @param y - The new y-coordinate of the window in pixels
    * @returns WindowsControlResponse indicating success or failure
+   * @note RobotJS does not support window management - this returns an error
    */
   // eslint-disable-next-line @typescript-eslint/require-await
   async repositionWindow(title: string, x: number, y: number): Promise<WindowsControlResponse> {
-    try {
-      const handles = libnut.getWindows();
-
-      for (const handle of handles) {
-        try {
-          const windowTitle = libnut.getWindowTitle(handle);
-          if (windowTitle.includes(title)) {
-            libnut.moveWindow(handle, { x, y });
-            return {
-              success: true,
-              message: `Successfully repositioned window: ${title} to (${x},${y})`,
-            };
-          }
-        } catch {
-          continue;
-        }
-      }
-
-      return {
-        success: false,
-        message: `Could not find window with title: ${title}`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: `Failed to reposition window: ${error instanceof Error ? error.message : String(error)}`,
-      };
-    }
+    // RobotJS does not have window management capabilities
+    return {
+      success: false,
+      message: `RobotJS does not support window management. Cannot reposition window: ${title} to (${x},${y}). Use a different automation provider for window operations.`,
+    };
   }
 
   /**
@@ -204,23 +123,25 @@ export class NutJSScreenAutomation implements ScreenAutomation {
       };
 
       // Capture screen or region
+      // RobotJS screen.capture() returns a Bitmap object with: width, height, byteWidth, bitsPerPixel, bytesPerPixel, image (Buffer)
       const screen = options?.region
-        ? (libnut.screen.capture(
+        ? robot.screen.capture(
             options.region.x,
             options.region.y,
             options.region.width,
             options.region.height,
-          ) as { width: number; height: number; image: Buffer })
-        : (libnut.screen.capture() as { width: number; height: number; image: Buffer });
+          )
+        : robot.screen.capture();
 
-      // Get the screen dimensions and image buffer with proper typing
+      // Get the screen dimensions and image buffer
       const width = screen.width;
       const height = screen.height;
-      const screenImage = screen.image;
+      // RobotJS types define image as 'any' but it's actually a Buffer
+      const screenImage = screen.image as Buffer;
 
       // Create a more memory-efficient pipeline using sharp
       try {
-        // Use sharp's raw processing - eliminates need for manual RGBA conversion
+        // Use sharp's raw processing - RobotJS returns BGRA format
         let pipeline = sharp(screenImage, {
           // Tell sharp this is BGRA format (not RGBA)
           raw: { width, height, channels: 4, premultiplied: false },

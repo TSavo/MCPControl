@@ -1,15 +1,15 @@
-import libnut from '@nut-tree-fork/libnut';
+import robot from '@jitsi/robotjs';
 import { KeyboardInput, KeyCombination, KeyHoldOperation } from '../../types/common.js';
 import { WindowsControlResponse } from '../../types/responses.js';
 import { KeyboardAutomation } from '../../interfaces/automation.js';
 
 /**
- * NutJS implementation of the KeyboardAutomation interface
+ * RobotJS implementation of the KeyboardAutomation interface
  */
-export class NutJSKeyboardAutomation implements KeyboardAutomation {
+export class RobotJSKeyboardAutomation implements KeyboardAutomation {
   typeText(input: KeyboardInput): WindowsControlResponse {
     try {
-      libnut.typeString(input.text);
+      robot.typeString(input.text);
       return {
         success: true,
         message: `Typed text successfully`,
@@ -24,7 +24,7 @@ export class NutJSKeyboardAutomation implements KeyboardAutomation {
 
   pressKey(key: string): WindowsControlResponse {
     try {
-      libnut.keyTap(key);
+      robot.keyTap(key);
       return {
         success: true,
         message: `Pressed key: ${key}`,
@@ -44,7 +44,7 @@ export class NutJSKeyboardAutomation implements KeyboardAutomation {
 
       // Press down all keys in sequence
       for (const key of combination.keys) {
-        libnut.keyToggle(key, 'down');
+        robot.keyToggle(key, 'down');
       }
 
       // Small delay to ensure all keys are pressed
@@ -52,7 +52,7 @@ export class NutJSKeyboardAutomation implements KeyboardAutomation {
 
       // Release all keys in reverse order
       for (const key of [...combination.keys].reverse()) {
-        libnut.keyToggle(key, 'up');
+        robot.keyToggle(key, 'up');
       }
 
       return {
@@ -63,7 +63,7 @@ export class NutJSKeyboardAutomation implements KeyboardAutomation {
       // Ensure all keys are released in case of error
       try {
         for (const key of combination.keys) {
-          libnut.keyToggle(key, 'up');
+          robot.keyToggle(key, 'up');
         }
       } catch {
         // Ignore errors during cleanup
@@ -79,12 +79,12 @@ export class NutJSKeyboardAutomation implements KeyboardAutomation {
   async holdKey(operation: KeyHoldOperation): Promise<WindowsControlResponse> {
     try {
       // Toggle the key state (down/up)
-      libnut.keyToggle(operation.key, operation.state);
+      robot.keyToggle(operation.key, operation.state);
 
       // If it's a key press (down) with duration, wait for the specified duration then release
       if (operation.state === 'down' && operation.duration) {
         await new Promise((resolve) => setTimeout(resolve, operation.duration));
-        libnut.keyToggle(operation.key, 'up');
+        robot.keyToggle(operation.key, 'up');
       }
 
       return {
@@ -97,7 +97,7 @@ export class NutJSKeyboardAutomation implements KeyboardAutomation {
       // Ensure key is released in case of error during hold
       if (operation.state === 'down') {
         try {
-          libnut.keyToggle(operation.key, 'up');
+          robot.keyToggle(operation.key, 'up');
         } catch {
           // Ignore errors during cleanup
         }

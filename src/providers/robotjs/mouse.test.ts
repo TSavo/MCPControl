@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import libnut from '@nut-tree-fork/libnut';
-import { NutJSMouseAutomation } from './mouse.js';
+import robot from '@jitsi/robotjs';
+import { RobotJSMouseAutomation } from './mouse.js';
 
-// Mock libnut
-vi.mock('@nut-tree-fork/libnut', () => ({
+// Mock robotjs
+vi.mock('@jitsi/robotjs', () => ({
   default: {
     moveMouse: vi.fn(),
     mouseClick: vi.fn(),
@@ -13,27 +13,27 @@ vi.mock('@nut-tree-fork/libnut', () => ({
   },
 }));
 
-describe('NutJSMouseAutomation', () => {
-  let mouseAutomation: NutJSMouseAutomation;
+describe('RobotJSMouseAutomation', () => {
+  let mouseAutomation: RobotJSMouseAutomation;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mouseAutomation = new NutJSMouseAutomation();
+    mouseAutomation = new RobotJSMouseAutomation();
     // Setup default mock for getMousePos
-    (libnut.getMousePos as any).mockReturnValue({ x: 0, y: 0 });
+    (robot.getMousePos as any).mockReturnValue({ x: 0, y: 0 });
   });
 
   describe('moveMouse', () => {
     it('should move mouse to the specified position', () => {
       const result = mouseAutomation.moveMouse({ x: 100, y: 200 });
 
-      expect(libnut.moveMouse).toHaveBeenCalledWith(100, 200);
+      expect(robot.moveMouse).toHaveBeenCalledWith(100, 200);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Mouse moved to position (100, 200)');
     });
 
     it('should handle errors', () => {
-      (libnut.moveMouse as any).mockImplementationOnce(() => {
+      (robot.moveMouse as any).mockImplementationOnce(() => {
         throw new Error('Move error');
       });
 
@@ -48,7 +48,7 @@ describe('NutJSMouseAutomation', () => {
     it('should click the specified mouse button', () => {
       const result = mouseAutomation.clickMouse('right');
 
-      expect(libnut.mouseClick).toHaveBeenCalledWith('right');
+      expect(robot.mouseClick).toHaveBeenCalledWith('right');
       expect(result.success).toBe(true);
       expect(result.message).toContain('Clicked right mouse button');
     });
@@ -56,12 +56,12 @@ describe('NutJSMouseAutomation', () => {
     it('should use left button by default', () => {
       const result = mouseAutomation.clickMouse();
 
-      expect(libnut.mouseClick).toHaveBeenCalledWith('left');
+      expect(robot.mouseClick).toHaveBeenCalledWith('left');
       expect(result.success).toBe(true);
     });
 
     it('should handle errors', () => {
-      (libnut.mouseClick as any).mockImplementationOnce(() => {
+      (robot.mouseClick as any).mockImplementationOnce(() => {
         throw new Error('Click error');
       });
 
@@ -76,8 +76,8 @@ describe('NutJSMouseAutomation', () => {
     it('should double-click at the current position', () => {
       const result = mouseAutomation.doubleClick();
 
-      expect(libnut.moveMouse).not.toHaveBeenCalled();
-      expect(libnut.mouseClick).toHaveBeenCalledWith('left', true);
+      expect(robot.moveMouse).not.toHaveBeenCalled();
+      expect(robot.mouseClick).toHaveBeenCalledWith('left', true);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Double clicked at current position');
     });
@@ -85,14 +85,14 @@ describe('NutJSMouseAutomation', () => {
     it('should double-click at the specified position', () => {
       const result = mouseAutomation.doubleClick({ x: 100, y: 200 });
 
-      expect(libnut.moveMouse).toHaveBeenCalledWith(100, 200);
-      expect(libnut.mouseClick).toHaveBeenCalledWith('left', true);
+      expect(robot.moveMouse).toHaveBeenCalledWith(100, 200);
+      expect(robot.mouseClick).toHaveBeenCalledWith('left', true);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Double clicked at position (100, 200)');
     });
 
     it('should handle errors when moving mouse', () => {
-      (libnut.moveMouse as any).mockImplementationOnce(() => {
+      (robot.moveMouse as any).mockImplementationOnce(() => {
         throw new Error('Move error');
       });
 
@@ -103,7 +103,7 @@ describe('NutJSMouseAutomation', () => {
     });
 
     it('should handle errors when clicking', () => {
-      (libnut.mouseClick as any).mockImplementationOnce(() => {
+      (robot.mouseClick as any).mockImplementationOnce(() => {
         throw new Error('Click error');
       });
 
@@ -116,17 +116,17 @@ describe('NutJSMouseAutomation', () => {
 
   describe('getCursorPosition', () => {
     it('should get the current cursor position', () => {
-      (libnut.getMousePos as any).mockReturnValue({ x: 300, y: 400 });
+      (robot.getMousePos as any).mockReturnValue({ x: 300, y: 400 });
 
       const result = mouseAutomation.getCursorPosition();
 
-      expect(libnut.getMousePos).toHaveBeenCalled();
+      expect(robot.getMousePos).toHaveBeenCalled();
       expect(result.success).toBe(true);
       expect(result.data).toEqual({ x: 300, y: 400 });
     });
 
     it('should handle errors', () => {
-      (libnut.getMousePos as any).mockImplementationOnce(() => {
+      (robot.getMousePos as any).mockImplementationOnce(() => {
         throw new Error('Position error');
       });
 
@@ -139,17 +139,17 @@ describe('NutJSMouseAutomation', () => {
 
   describe('clickAt', () => {
     it('should move to position, click, and return to original position', () => {
-      (libnut.getMousePos as any).mockReturnValue({ x: 10, y: 20 });
+      (robot.getMousePos as any).mockReturnValue({ x: 10, y: 20 });
 
       const result = mouseAutomation.clickAt(100, 200);
 
-      expect(libnut.getMousePos).toHaveBeenCalledTimes(1);
-      expect(libnut.moveMouse).toHaveBeenCalledTimes(2);
-      expect(libnut.mouseClick).toHaveBeenCalledTimes(1);
+      expect(robot.getMousePos).toHaveBeenCalledTimes(1);
+      expect(robot.moveMouse).toHaveBeenCalledTimes(2);
+      expect(robot.mouseClick).toHaveBeenCalledTimes(1);
 
-      expect(libnut.moveMouse).toHaveBeenNthCalledWith(1, 100, 200);
-      expect(libnut.moveMouse).toHaveBeenNthCalledWith(2, 10, 20);
-      expect(libnut.mouseClick).toHaveBeenCalledWith('left');
+      expect(robot.moveMouse).toHaveBeenNthCalledWith(1, 100, 200);
+      expect(robot.moveMouse).toHaveBeenNthCalledWith(2, 10, 20);
+      expect(robot.mouseClick).toHaveBeenCalledWith('left');
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('Clicked left button at position (100, 200)');
@@ -158,13 +158,13 @@ describe('NutJSMouseAutomation', () => {
     it('should return error for invalid coordinates', () => {
       const result = mouseAutomation.clickAt(NaN, 200);
 
-      expect(libnut.moveMouse).not.toHaveBeenCalled();
+      expect(robot.moveMouse).not.toHaveBeenCalled();
       expect(result.success).toBe(false);
       expect(result.message).toContain('Invalid coordinates provided');
     });
 
     it('should handle errors getting cursor position', () => {
-      (libnut.getMousePos as any).mockImplementationOnce(() => {
+      (robot.getMousePos as any).mockImplementationOnce(() => {
         throw new Error('Position error');
       });
 
@@ -175,8 +175,8 @@ describe('NutJSMouseAutomation', () => {
     });
 
     it('should handle errors when moving mouse', () => {
-      (libnut.getMousePos as any).mockReturnValue({ x: 10, y: 20 });
-      (libnut.moveMouse as any).mockImplementationOnce(() => {
+      (robot.getMousePos as any).mockReturnValue({ x: 10, y: 20 });
+      (robot.moveMouse as any).mockImplementationOnce(() => {
         throw new Error('Move error');
       });
 
@@ -187,8 +187,8 @@ describe('NutJSMouseAutomation', () => {
     });
 
     it('should handle errors when clicking', () => {
-      (libnut.getMousePos as any).mockReturnValue({ x: 10, y: 20 });
-      (libnut.mouseClick as any).mockImplementationOnce(() => {
+      (robot.getMousePos as any).mockReturnValue({ x: 10, y: 20 });
+      (robot.mouseClick as any).mockImplementationOnce(() => {
         throw new Error('Click error');
       });
 
@@ -203,7 +203,7 @@ describe('NutJSMouseAutomation', () => {
     it('should scroll down with positive amount', () => {
       const result = mouseAutomation.scrollMouse(10);
 
-      expect(libnut.scrollMouse).toHaveBeenCalledWith(0, 10);
+      expect(robot.scrollMouse).toHaveBeenCalledWith(0, 10);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Scrolled mouse down by 10 units');
     });
@@ -211,13 +211,13 @@ describe('NutJSMouseAutomation', () => {
     it('should scroll up with negative amount', () => {
       const result = mouseAutomation.scrollMouse(-5);
 
-      expect(libnut.scrollMouse).toHaveBeenCalledWith(0, -5);
+      expect(robot.scrollMouse).toHaveBeenCalledWith(0, -5);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Scrolled mouse up by 5 units');
     });
 
     it('should handle errors', () => {
-      (libnut.scrollMouse as any).mockImplementationOnce(() => {
+      (robot.scrollMouse as any).mockImplementationOnce(() => {
         throw new Error('Scroll error');
       });
 
@@ -235,13 +235,13 @@ describe('NutJSMouseAutomation', () => {
 
       const result = mouseAutomation.dragMouse(from, to, 'right');
 
-      expect(libnut.moveMouse).toHaveBeenCalledTimes(2);
-      expect(libnut.moveMouse).toHaveBeenNthCalledWith(1, 100, 200);
-      expect(libnut.moveMouse).toHaveBeenNthCalledWith(2, 300, 400);
+      expect(robot.moveMouse).toHaveBeenCalledTimes(2);
+      expect(robot.moveMouse).toHaveBeenNthCalledWith(1, 100, 200);
+      expect(robot.moveMouse).toHaveBeenNthCalledWith(2, 300, 400);
 
-      expect(libnut.mouseToggle).toHaveBeenCalledTimes(2);
-      expect(libnut.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'right');
-      expect(libnut.mouseToggle).toHaveBeenNthCalledWith(2, 'up', 'right');
+      expect(robot.mouseToggle).toHaveBeenCalledTimes(2);
+      expect(robot.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'right');
+      expect(robot.mouseToggle).toHaveBeenNthCalledWith(2, 'up', 'right');
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('Dragged from (100, 200) to (300, 400) with right button');
@@ -250,20 +250,20 @@ describe('NutJSMouseAutomation', () => {
     it('should use left button by default', () => {
       const result = mouseAutomation.dragMouse({ x: 10, y: 20 }, { x: 30, y: 40 });
 
-      expect(libnut.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'left');
+      expect(robot.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'left');
       expect(result.success).toBe(true);
     });
 
     it('should handle errors and release mouse button', () => {
-      (libnut.moveMouse as any).mockImplementationOnce(() => {});
-      (libnut.mouseToggle as any).mockImplementationOnce(() => {});
-      (libnut.moveMouse as any).mockImplementationOnce(() => {
+      (robot.moveMouse as any).mockImplementationOnce(() => {});
+      (robot.mouseToggle as any).mockImplementationOnce(() => {});
+      (robot.moveMouse as any).mockImplementationOnce(() => {
         throw new Error('Drag error');
       });
 
       const result = mouseAutomation.dragMouse({ x: 10, y: 20 }, { x: 30, y: 40 });
 
-      expect(libnut.mouseToggle).toHaveBeenCalledTimes(2); // Once for down, once for cleanup
+      expect(robot.mouseToggle).toHaveBeenCalledTimes(2); // Once for down, once for cleanup
       expect(result.success).toBe(false);
       expect(result.message).toContain('Failed to drag mouse: Drag error');
     });
@@ -271,8 +271,8 @@ describe('NutJSMouseAutomation', () => {
     it('should return error for invalid coordinates', () => {
       const result = mouseAutomation.dragMouse({ x: NaN, y: 200 }, { x: 300, y: 400 });
 
-      expect(libnut.moveMouse).not.toHaveBeenCalled();
-      expect(libnut.mouseToggle).not.toHaveBeenCalled();
+      expect(robot.moveMouse).not.toHaveBeenCalled();
+      expect(robot.mouseToggle).not.toHaveBeenCalled();
       expect(result.success).toBe(false);
       expect(result.message).toContain('Invalid coordinates provided');
     });
@@ -282,7 +282,7 @@ describe('NutJSMouseAutomation', () => {
     it('should return error for invalid coordinates', () => {
       const result = mouseAutomation.moveMouse({ x: NaN, y: 200 });
 
-      expect(libnut.moveMouse).not.toHaveBeenCalled();
+      expect(robot.moveMouse).not.toHaveBeenCalled();
       expect(result.success).toBe(false);
       expect(result.message).toContain('Invalid coordinates provided');
     });
