@@ -138,7 +138,7 @@ class MCPControlServer {
       }
 
       // Set up error handler for HTTP server
-      this.httpServer.httpServer.on('error', (err) => {
+      this.httpServer.httpServer.on('error', (err: Error) => {
         process.stderr.write(`Failed to start HTTP server: ${err.message}\n`);
       });
 

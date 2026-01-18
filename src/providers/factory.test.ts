@@ -5,12 +5,12 @@ import { RobotJSProvider } from './robotjs/index.js';
 // Mock the providers
 vi.mock('./robotjs/index.js', () => {
   return {
-    RobotJSProvider: vi.fn().mockImplementation(() => ({
-      keyboard: {},
-      mouse: {},
-      screen: {},
-      clipboard: {},
-    })),
+    RobotJSProvider: vi.fn().mockImplementation(function () {
+      this.keyboard = {};
+      this.mouse = {};
+      this.screen = {};
+      this.clipboard = {};
+    }),
   };
 });
 

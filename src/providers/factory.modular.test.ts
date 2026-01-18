@@ -12,33 +12,33 @@ import { WindowsControlResponse } from '../types/responses.js';
 
 // Mock the individual provider imports
 vi.mock('./clipboard/powershell/index.js', () => ({
-  PowerShellClipboardProvider: vi.fn().mockImplementation(() => ({
-    getClipboardContent: vi.fn().mockResolvedValue({ success: true, data: 'powershell' }),
-    setClipboardContent: vi.fn().mockResolvedValue({ success: true }),
-    hasClipboardText: vi.fn().mockResolvedValue({ success: true, data: true }),
-    clearClipboard: vi.fn().mockResolvedValue({ success: true }),
-  })),
+  PowerShellClipboardProvider: vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+    this.getClipboardContent = vi.fn().mockResolvedValue({ success: true, data: 'powershell' });
+    this.setClipboardContent = vi.fn().mockResolvedValue({ success: true });
+    this.hasClipboardText = vi.fn().mockResolvedValue({ success: true, data: true });
+    this.clearClipboard = vi.fn().mockResolvedValue({ success: true });
+  }),
 }));
 
 vi.mock('./clipboard/clipboardy/index.js', () => ({
-  ClipboardyProvider: vi.fn().mockImplementation(() => ({
-    getClipboardContent: vi.fn().mockResolvedValue({ success: true, data: 'clipboardy' }),
-    setClipboardContent: vi.fn().mockResolvedValue({ success: true }),
-    hasClipboardText: vi.fn().mockResolvedValue({ success: true, data: true }),
-    clearClipboard: vi.fn().mockResolvedValue({ success: true }),
-  })),
+  ClipboardyProvider: vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+    this.getClipboardContent = vi.fn().mockResolvedValue({ success: true, data: 'clipboardy' });
+    this.setClipboardContent = vi.fn().mockResolvedValue({ success: true });
+    this.hasClipboardText = vi.fn().mockResolvedValue({ success: true, data: true });
+    this.clearClipboard = vi.fn().mockResolvedValue({ success: true });
+  }),
 }));
 
 // Mock robotjs provider
 vi.mock('./robotjs/index.js', () => ({
-  RobotJSProvider: vi.fn().mockImplementation(() => ({
-    keyboard: {
+  RobotJSProvider: vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+    this.keyboard = {
       typeText: vi.fn().mockResolvedValue({ success: true }),
       pressKey: vi.fn().mockResolvedValue({ success: true }),
       pressKeyCombination: vi.fn().mockResolvedValue({ success: true }),
       holdKey: vi.fn().mockResolvedValue({ success: true }),
-    },
-    mouse: {
+    };
+    this.mouse = {
       moveMouse: vi.fn().mockResolvedValue({ success: true }),
       clickMouse: vi.fn().mockResolvedValue({ success: true }),
       doubleClick: vi.fn().mockResolvedValue({ success: true }),
@@ -46,8 +46,8 @@ vi.mock('./robotjs/index.js', () => ({
       scrollMouse: vi.fn().mockResolvedValue({ success: true }),
       dragMouse: vi.fn().mockResolvedValue({ success: true }),
       clickAt: vi.fn().mockResolvedValue({ success: true }),
-    },
-    screen: {
+    };
+    this.screen = {
       getScreenSize: vi
         .fn()
         .mockResolvedValue({ success: true, data: { width: 1920, height: 1080 } }),
@@ -59,14 +59,14 @@ vi.mock('./robotjs/index.js', () => ({
         success: true,
         data: { data: '', format: 'png', width: 1920, height: 1080 },
       }),
-    },
-    clipboard: {
+    };
+    this.clipboard = {
       getClipboardContent: vi.fn().mockResolvedValue({ success: true, data: '' }),
       setClipboardContent: vi.fn().mockResolvedValue({ success: true }),
       hasClipboardText: vi.fn().mockResolvedValue({ success: true, data: true }),
       clearClipboard: vi.fn().mockResolvedValue({ success: true }),
-    },
-  })),
+    };
+  }),
 }));
 
 describe('Factory with Modular Providers', () => {
@@ -185,24 +185,24 @@ describe('Factory with Modular Providers', () => {
     it('should create keysender provider by default', () => {
       // Mock keysender provider to avoid ELF header issue
       vi.doMock('./keysender/index.js', () => ({
-        KeysenderProvider: vi.fn().mockImplementation(() => ({
-          keyboard: {
+        KeysenderProvider: vi.fn().mockImplementation(function (this: Record<string, unknown>) {
+          this.keyboard = {
             typeText: vi.fn(),
             pressKey: vi.fn(),
-          },
-          mouse: {
+          };
+          this.mouse = {
             moveMouse: vi.fn(),
             clickMouse: vi.fn(),
-          },
-          screen: {
+          };
+          this.screen = {
             getScreenSize: vi.fn(),
             getActiveWindow: vi.fn(),
-          },
-          clipboard: {
+          };
+          this.clipboard = {
             getClipboardContent: vi.fn(),
             setClipboardContent: vi.fn(),
-          },
-        })),
+          };
+        }),
       }));
 
       const provider = createAutomationProvider();

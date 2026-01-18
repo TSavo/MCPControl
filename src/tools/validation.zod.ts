@@ -155,10 +155,14 @@ export const MouseButtonSchema = z.enum(['left', 'right', 'middle']);
 /**
  * Zod schema for keyboard key validation
  */
-export const KeySchema = z.string().refine(
-  (key) => VALID_KEYS_lowercase.includes(key.toLowerCase()),
-  (key) => ({ message: `Invalid key: "${key}". Must be one of the allowed keys.` }),
-);
+export const KeySchema = z.string().superRefine((key, ctx) => {
+  if (!VALID_KEYS_lowercase.includes(key.toLowerCase())) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Invalid key: "${key}". Must be one of the allowed keys.`,
+    });
+  }
+});
 
 /**
  * Helper function to detect dangerous key combinations
@@ -201,15 +205,15 @@ export const KeyCombinationSchema = z.object({
     .array(KeySchema)
     .min(1, 'Key combination must contain at least one key')
     .max(5, 'Too many keys in combination (max 5)')
-    .refine(
-      (keys) => {
-        const dangerous = isDangerousKeyCombination(keys);
-        return dangerous === null;
-      },
-      (keys) => ({
-        message: `Potentially dangerous key combination: ${keys.join('+')}. ${isDangerousKeyCombination(keys)}`,
-      }),
-    ),
+    .superRefine((keys, ctx) => {
+      const dangerous = isDangerousKeyCombination(keys);
+      if (dangerous !== null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Potentially dangerous key combination: ${keys.join('+')}. ${dangerous}`,
+        });
+      }
+    }),
 });
 
 /**

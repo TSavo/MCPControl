@@ -253,9 +253,9 @@ describe('Tools Handler', () => {
       });
 
       expect(result.isError).toBe(true);
-      // Updated to match Zod validation error format
-      expect(result.content[0].text).toContain('issues');
+      // Zod 4 serializes ZodError directly to an array of issues (not wrapped in {issues: ...})
       expect(result.content[0].text).toContain('invalid_type');
+      expect(result.content[0].text).toContain('expected');
     });
 
     it('should handle tool execution errors', async () => {
