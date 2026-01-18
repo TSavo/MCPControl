@@ -1,11 +1,42 @@
 {
   "name": "mcp-control",
   "version": "0.4.0",
-  "description": "Cross-platform control server for the Model Context Protocol",
+  "description": "Cross-platform desktop automation server for the Model Context Protocol (MCP)",
   "license": "MIT",
   "type": "module",
   "main": "build/index.js",
-  "bin": "build/index.js",
+  "bin": {
+    "mcp-control": "build/index.js"
+  },
+  "files": [
+    "build/**/*.js",
+    "build/**/*.d.ts",
+    "!build/**/*.test.js",
+    "!build/**/*.test.d.ts",
+    "!build/providers/keysender",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TSavo/MCPControl.git"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "automation",
+    "desktop",
+    "mouse",
+    "keyboard",
+    "screenshot",
+    "robotjs",
+    "claude",
+    "ai"
+  ],
+  "author": "TSavo",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "build:all": "node scripts/build.js",
