@@ -1,25 +1,15 @@
 # Contributing to MCPControl
 
-> **Note**: MCPControl is not actively developed or supported. We will accept pull requests for bug fixes and new features, but please understand that response times may be slow and there is no guarantee of merging.
-
-This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to MCPControl! This document provides guidelines for contributing to the project.
 
 ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Setup](#setup)
 - [Development Workflow](#development-workflow)
-  - [Branching Strategy](#branching-strategy)
-  - [Commit Guidelines](#commit-guidelines)
-  - [Pull Requests](#pull-requests)
 - [Code Style and Standards](#code-style-and-standards)
 - [Testing](#testing)
 - [Documentation](#documentation)
-- [Project Structure](#project-structure)
-- [Issue Tracking](#issue-tracking)
-- [Future Roadmap](#future-roadmap)
 
 ## Code of Conduct
 
@@ -29,27 +19,30 @@ Please be respectful and considerate of others when contributing to this project
 
 ### Prerequisites
 
-- Node.js (latest LTS version recommended)
+- Node.js 20+ (LTS version recommended)
 - npm
 - git
-- C++ compiler (for building native modules)
+
+That's it! The `@jitsi/robotjs` library includes prebuilt binaries for all platforms.
 
 ### Setup
 
-1. Fork the repository
+1. Fork the repository at [github.com/TSavo/MCPControl](https://github.com/TSavo/MCPControl)
 2. Clone your fork:
    ```bash
    git clone https://github.com/YOUR-USERNAME/MCPControl.git
    cd MCPControl
    ```
 
-3. Build the project:
+3. Install dependencies and build:
    ```bash
-   # Install dependencies
    npm install
-
-   # Build the project
    npm run build
+   ```
+
+4. Run tests to verify setup:
+   ```bash
+   npm test
    ```
 
 ## Development Workflow
@@ -74,14 +67,13 @@ Please be respectful and considerate of others when contributing to this project
 1. Create your feature branch: `git checkout -b feature/amazing-feature`
 2. Commit your changes: `git commit -m 'Add some amazing feature'`
 3. Push to the branch: `git push origin feature/amazing-feature`
-4. Open a Pull Request
+4. Open a Pull Request against `main`
 5. Ensure all tests pass and code meets the project standards
-6. Request a review from a maintainer
 
 ## Code Style and Standards
 
 - Use ES module syntax with named imports
-- Define TypeScript interfaces for inputs/outputs in the `types/` directory
+- Define TypeScript interfaces in the `types/` directory
 - Use try/catch with standardized response objects for error handling
 - Follow naming conventions:
   - camelCase for variables/functions
@@ -95,65 +87,52 @@ Please be respectful and considerate of others when contributing to this project
 ## Testing
 
 - Place tests in the same directory as implementation with `.test.ts` suffix
-- Run tests with `npm run test`
+- Run tests with `npm test`
 - Generate coverage report with `npm run test:coverage`
-- Run a single test with `npm run test -- tools/keyboard.test.ts` or `npm run test -- -t "specific test name"`
+- Run a single test with `npm test -- tools/keyboard.test.ts`
 - Run tests in watch mode with `npm run test:watch`
 
-All new features should include appropriate test coverage. The project uses Vitest for testing.
+All new features should include appropriate test coverage. The project uses Vitest 4.x for testing.
+
+### Vitest 4.x Mock Pattern
+
+When mocking classes, use constructor functions:
+
+```typescript
+vi.mock('./module.js', () => ({
+  MyClass: vi.fn().mockImplementation(function() {
+    this.method = vi.fn();
+  })
+}));
+```
 
 ## Documentation
 
 - Document public APIs with JSDoc comments
-- Update README.md when adding new features or changing functionality
+- Update README.md when adding new features
 - Keep code comments clear and focused on explaining "why" rather than "what"
 
 ## Project Structure
 
-- `/src`
-  - `/handlers` - Request handlers and tool management
-  - `/tools` - Core functionality implementations
-  - `/types` - TypeScript type definitions
-  - `index.ts` - Main application entry point
-
-## Issue Tracking
-
-While we are not actively developing MCPControl, you may still submit issues for:
-- Bug reports with clear reproduction steps
-- Feature requests (though implementation is not guaranteed)
-
-When creating a new issue:
-- Use descriptive titles
-- Include steps to reproduce for bugs
-- For feature requests, explain the use case and potential implementation approach
-- Be prepared to implement the fix/feature yourself via PR
+```
+/src
+  /handlers    - Request handlers and tool management
+  /providers   - Automation provider implementations
+    /robotjs   - Default cross-platform provider
+    /autohotkey - Windows-only provider
+  /tools       - Core functionality implementations
+  /types       - TypeScript type definitions
+  index.ts     - Main application entry point
+```
 
 ## Areas for Contribution
 
-If you'd like to contribute, here are some areas that could use improvement:
-
-- Cross-platform compatibility enhancements
-- Additional automation providers (e.g., macOS, Linux)
 - Bug fixes for existing functionality
 - Documentation improvements
 - Test coverage improvements
-
-Note: There is no active roadmap or planned features as the project is not under active development.
-
-## Publishing
-
-**Note**: MCPControl cannot be published to npm because the nutjs dependency requires compilation from source on each target system. Users must build from source following the instructions in the README.
-
-The npm publish workflow has been disabled. To create a new release:
-
-1. Ensure changes are merged to main
-2. Create and push a tag with the version number:
-   ```bash
-   git tag v1.2.3
-   git push origin v1.2.3
-   ```
-3. Create a GitHub release with build instructions
+- New automation providers
+- Performance optimizations
 
 ---
 
-Thank you for contributing to MCP Control!
+Thank you for contributing to MCPControl!

@@ -1,48 +1,98 @@
 # MCPControl Automation Providers
 
-MCPControl supports multiple automation providers to give users flexibility in how they control their systems. Each provider has its own strengths and may work better in different environments.
+MCPControl supports multiple automation providers for flexibility across different platforms and use cases.
 
 ## Available Providers
 
-### NutJS Provider (Default)
+### RobotJS Provider (Default)
 
-The NutJS provider uses the [@nut-tree/libnut](https://github.com/nut-tree/libnut) library for system automation. It provides comprehensive cross-platform support for keyboard, mouse, screen, and clipboard operations with excellent Windows compatibility.
+The RobotJS provider uses [@jitsi/robotjs](https://github.com/nickeddy/robotjs), an actively maintained fork of the original robotjs library. It provides cross-platform support for Windows, macOS, and Linux with **prebuilt binaries** - no compilation required.
+
+**Features:**
+- Mouse control (move, click, double-click, drag, scroll)
+- Keyboard input (type text, key combinations, key hold)
+- Screen capture with grid overlay
+- Cross-platform (Windows, macOS, Linux)
+
+**Limitations:**
+- Window management operations are not supported
+- Some key combinations may behave differently across platforms
+
+### AutoHotkey Provider (Windows Only)
+
+Uses AutoHotkey v2 for Windows automation. Useful for advanced Windows-specific automation scenarios.
+
+### PowerShell Clipboard Provider (Windows Only)
+
+Uses PowerShell for clipboard operations on Windows. Can be mixed with other providers.
 
 ## Selecting a Provider
 
-You can select which provider to use by setting the `AUTOMATION_PROVIDER` environment variable:
+Set the `AUTOMATION_PROVIDER` environment variable:
 
 ```bash
-# Use the NutJS provider (default)
-AUTOMATION_PROVIDER=nutjs node build/index.js
+# Use the RobotJS provider (default)
+AUTOMATION_PROVIDER=robotjs node build/index.js --sse
+
+# Use AutoHotkey on Windows
+AUTOMATION_PROVIDER=autohotkey node build/index.js --sse
 ```
 
-### Screen Automation Considerations
+### Modular Provider Configuration
 
-The NutJS provider has the following considerations for screen automation:
+Mix and match providers for different operations:
 
-- **Window Detection Challenges**: Getting accurate window information can be challenging, especially with:
-  - Window handles that may not always be valid
-  - Window titles that may be empty or not match expected values
-  - Position and size information that may be unavailable or return extreme negative values for minimized windows
-- **Window Repositioning and Resizing**: Operations work but may not always report accurate results due to limitations in the underlying API
-- **Window Focusing**: May not work reliably for all window types or applications
-- **Screenshot Functionality**: May not work consistently in all environments
+```bash
+export AUTOMATION_KEYBOARD_PROVIDER=autohotkey
+export AUTOMATION_MOUSE_PROVIDER=robotjs
+export AUTOMATION_SCREEN_PROVIDER=robotjs
+export AUTOMATION_CLIPBOARD_PROVIDER=powershell
+```
 
-We've implemented significant fallbacks and robust error handling for window operations, including:
+## RobotJS Provider Details
 
-- Advanced window selection strategy that prioritizes common applications for better reliability
-- Detailed logging to help diagnose window handling issues
-- Fallback mechanisms when window operations don't produce the expected results
-- Safe property access with type checking to handle edge cases
+### Screenshot with Grid Overlay
 
-### Recent Improvements
+The RobotJS provider supports a coordinate grid overlay for precise clicking:
 
-Recent updates to the provider include:
+```javascript
+// Enable grid with default 100px spacing
+await provider.screen.getScreenshot({ grid: true });
 
-- Added a sophisticated window finding algorithm that tries multiple strategies to locate usable windows
-- Enhanced window resizing and repositioning with better error handling and result verification
-- Improved window information retrieval with multiple fallback layers for missing data
-- Better window focusing with proper foreground window management and status reporting
-- More robust error handling throughout window operations with detailed logging
-- Added support for child window detection and management
+// Custom grid spacing (50px)
+await provider.screen.getScreenshot({ grid: 50 });
+
+// Adjust grid transparency (0-100)
+await provider.screen.getScreenshot({
+  grid: true,
+  gridTransparency: 70
+});
+```
+
+The grid displays true screen coordinates, accounting for any image resizing. This makes it easy to identify exact click positions.
+
+### Platform Notes
+
+**Windows**: Works out of the box.
+
+**macOS**: Works out of the box. May require accessibility permissions.
+
+**Linux**:
+- Requires X11 (Wayland not supported)
+- May need to install X11 development libraries
+- May require `input` group membership for input device access
+
+## Creating Custom Providers
+
+To add a new provider, implement the `AutomationProvider` interface in `src/interfaces/provider.ts`:
+
+```typescript
+interface AutomationProvider {
+  keyboard: KeyboardAutomation;
+  mouse: MouseAutomation;
+  screen: ScreenAutomation;
+  clipboard: ClipboardAutomation;
+}
+```
+
+See existing providers in `src/providers/` for implementation examples.
