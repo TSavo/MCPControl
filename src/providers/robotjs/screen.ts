@@ -174,6 +174,47 @@ export class RobotJSScreenAutomation implements ScreenAutomation {
           });
         }
 
+        // Draw grid overlay if requested
+        if (mergedOptions.grid) {
+          const gridSpacing = typeof mergedOptions.grid === 'number' ? mergedOptions.grid : 100;
+
+          // Calculate final image dimensions from resize settings
+          const targetWidth = mergedOptions.resize?.width || 1280;
+          const imgWidth = Math.min(width, targetWidth);
+          const imgHeight = Math.round(height * (imgWidth / width));
+
+          // RobotJS doesn't have window position API, so offset is 0 for full screen
+          const offsetX = options?.region?.x || 0;
+          const offsetY = options?.region?.y || 0;
+
+          // Calculate scale factor (image pixels to screen pixels)
+          const scaleX = width / imgWidth;
+          const scaleY = height / imgHeight;
+
+          // Calculate grid opacity from transparency (0-100 -> 0-1)
+          const gridOpacity = (mergedOptions.gridTransparency ?? 50) / 100;
+          const textOpacity = Math.min(1, gridOpacity + 0.3); // Text slightly more visible
+
+          // Build SVG grid with screen coordinates (accounting for region offset and scale)
+          let svgLines = '';
+          for (let x = gridSpacing; x < imgWidth; x += gridSpacing) {
+            const screenX = Math.round(offsetX + x * scaleX);
+            svgLines += `<line x1="${x}" y1="0" x2="${x}" y2="${imgHeight}" stroke="rgba(255,0,0,${gridOpacity})" stroke-width="1"/>`;
+            svgLines += `<text x="${x + 2}" y="12" font-size="10" fill="rgba(255,0,0,${textOpacity})">${screenX}</text>`;
+          }
+          for (let y = gridSpacing; y < imgHeight; y += gridSpacing) {
+            const screenY = Math.round(offsetY + y * scaleY);
+            svgLines += `<line x1="0" y1="${y}" x2="${imgWidth}" y2="${y}" stroke="rgba(255,0,0,${gridOpacity})" stroke-width="1"/>`;
+            svgLines += `<text x="2" y="${y - 2}" font-size="10" fill="rgba(255,0,0,${textOpacity})">${screenY}</text>`;
+          }
+
+          const svgOverlay = Buffer.from(
+            `<svg width="${imgWidth}" height="${imgHeight}">${svgLines}</svg>`,
+          );
+
+          pipeline = pipeline.composite([{ input: svgOverlay, top: 0, left: 0 }]);
+        }
+
         // Apply appropriate format-specific compression
         if (mergedOptions.format === 'jpeg') {
           pipeline = pipeline.jpeg({
